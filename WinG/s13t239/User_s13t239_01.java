@@ -80,21 +80,21 @@ public class User_s13t239_01 extends GogoCompSub {
         // 埋まっているマスはスルー
         if (values[i][j] == -2) { continue; }
         //--  適当な評価の例
-        // 相手の五連を崩す → 1000;
-      	if ( check_run1(cell, mycolor*-1, i, j, 5) ) {
+        // 勝利(五取) → 1000;
+      	if ( mystone == 8 && check_rem(cell, mycolor, i, j) ) {
       	  values[i][j] = 1000;
       	  continue;
       	}
-        // 勝利(五取) → 950;
-      	if ( mystone == 8 && check_rem(cell, mycolor, i, j) ) {
-      	  values[i][j] = 950;
-      	  continue;
-      	}
-        // 勝利(五連) → 900;
+        // 勝利(五連) → 950;
         if ( check_run(cell, mycolor, i, j, 5) || check_run1(cell, mycolor, i, j, 5) ) {
-          values[i][j] = 900;
+          values[i][j] = 950;
           continue;
         }
+      	 // 相手の五連を崩す → 900;
+      	if ( check_run1(cell, mycolor*-1, i, j, 5) ) {
+      	  values[i][j] = 900;
+      	  continue;
+      	}
         // 敗北阻止(五取) → 850;
       	if ( enemystone == 8 && check_run(cell, mycolor, i, j, 3) ) {
       		values[i][j] = 850;

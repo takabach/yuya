@@ -81,25 +81,25 @@ public class User_s13t239_01 extends GogoCompSub {
         if (values[i][j] == -2) { continue; }
         //--  適当な評価の例
         // 勝利(五取) → 1000;
-      	if ( mystone == 8 && check_rem(cell, mycolor, i, j) ) {
-      	  values[i][j] = 1000;
-      	  continue;
-      	}
+        if ( mystone == 8 && check_rem(cell, mycolor, i, j) ) {
+          values[i][j] = 1000;
+          continue;
+        }
         // 勝利(五連) → 950;
         if ( check_run(cell, mycolor, i, j, 5) || check_run1(cell, mycolor, i, j, 5) ) {
           values[i][j] = 950;
           continue;
         }
-      	 // 相手の五連を崩す → 900;
-      	if ( check_run1(cell, mycolor*-1, i, j, 5) ) {
-      	  values[i][j] = 900;
-      	  continue;
-      	}
+        // 相手の五連を崩す → 900;
+        if ( check_run1(cell, mycolor*-1, i, j, 5) ) {
+          values[i][j] = 900;
+          continue;
+        }
         // 敗北阻止(五取) → 850;
-      	if ( enemystone == 8 && check_run(cell, mycolor, i, j, 3) ) {
-      		values[i][j] = 850;
-      	  continue;
-      	}
+        if ( enemystone == 8 && check_run(cell, mycolor, i, j, 3) ) {
+          values[i][j] = 850;
+          continue;
+        }
         // 敗北阻止(五連) → 800;
         if ( check_run(cell, mycolor*-1, i, j, 5) ) {
           values[i][j] = 800;
@@ -115,19 +115,19 @@ public class User_s13t239_01 extends GogoCompSub {
           values[i][j] = 600;
           continue;
         }
-        // 相手の三連を防ぐ → 500;
+        // 自分の石を守る → 500;
+        if ( check_rem(cell, mycolor*-1, i, j) ) { values[i][j] = 500; }
+        // 相手の石を取る → 400;
+        if ( check_rem(cell, mycolor, i, j) ) { values[i][j] = 400; }
+        // 相手の三連を防ぐ → 300;
         if ( check_run(cell, mycolor*-1, i, j, 3) || check_run1(cell, mycolor*-1, i, j, 3)) {
-          values[i][j] = 500;
+          values[i][j] = 300;
           continue;
         }
-        // 自分の三連を作る → 400;
-        if ( check_run(cell, mycolor, i, j, 3) /*|| check_run1(cell, mycolor, i, j, 3)*/) { values[i][j] = 400; }
+        // 自分の三連を作る → 200;
+        if ( check_run(cell, mycolor, i, j, 3) ) { values[i][j] = 200; }
         // 三々の禁じ手は打たない → -1;
         if ( check_run2(cell, mycolor, i, j) ) { values[i][j] = -1; }
-        // 相手の石を取る → 300;
-        if ( check_rem(cell, mycolor, i, j) ) { values[i][j] = 300; }
-        // 自分の石を守る → 200;
-        if ( check_rem(cell, mycolor*-1, i, j) ) { values[i][j] = 200; }
         // ランダム
         if (values[i][j] == 0) {
           int aaa = (int) Math.round(Math.random() * 15);
@@ -159,24 +159,24 @@ public class User_s13t239_01 extends GogoCompSub {
 //----------------------------------------------------------------
   
   boolean check_run_dir(int[][] board, int color, int i, int j, int dx, int dy, int len) {
-  	int k;
-  	int n;
-  	int x,y,x1,y1;
+    int k;
+    int n;
+    int x,y,x1,y1;
     for ( k = 1; k < len; k++ ) {
       x = i+k*dx;
       y = j+k*dy;
       if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
       if ( board[x][y] != color ) { return false; }
     }
-  	if ( len != 5 ) {
-  	x = i+4*dx;
-  	y = j+4*dy;
-  	x1 = i+dx*(-1);
-  	y1 = j+dy*(-1);
-  	if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
-  	if ( x1 < 0 || y1 < 0 || x1 >= size || y1 >= size ) { return false; }
-  	if ( board[x][y] == color*-1 && board[x1][y1] == color*-1 ) { return false; }
-  	}
+    if ( len != 5 ) {
+    x = i+4*dx;
+    y = j+4*dy;
+    x1 = i+dx*(-1);
+    y1 = j+dy*(-1);
+    if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
+    if ( x1 < 0 || y1 < 0 || x1 >= size || y1 >= size ) { return false; }
+    if ( board[x][y] == color*-1 || board[x1][y1] == color*-1 ) { return false; }
+    }
     return true;
   }
 
@@ -241,6 +241,13 @@ public class User_s13t239_01 extends GogoCompSub {
         if ( board[x][y] != color ) { return false; }
         if ( board[x1][y1] != color ) { return false; }
       }
+      x = i+4*dx;
+      y = j+4*dy;
+      x1 = i+dx*(-2);
+      y1 = i+dx*(-2);
+      if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
+      if ( x1 < 0 || y1 < 0 || x1 >= size || y1 >= size ) { return false; }
+      if ( board[x][y] == color*-1 || board[x1][y1] == color*-1 ) { return false; }
       return true;
       
     //----- 3連の判定
@@ -258,7 +265,7 @@ public class User_s13t239_01 extends GogoCompSub {
       return true;
     }
   }
-	
+
 //----------------------------------------------------------------
 //  連の全周チェック(禁じ手判定用)
 //----------------------------------------------------------------
@@ -275,7 +282,7 @@ public class User_s13t239_01 extends GogoCompSub {
     if ( cnt > 1 ) { return true; }
     else { return false; }
   }
-	
+
 //----------------------------------------------------------------
 //  取の全周チェック(ダブルの判定は無し)
 //----------------------------------------------------------------

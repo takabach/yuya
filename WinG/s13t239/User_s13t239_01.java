@@ -128,7 +128,9 @@ public class User_s13t239_01 extends GogoCompSub {
         if ( check_run(cell, mycolor, i, j, 3) ) { values[i][j] = 200; }
         // 三々の禁じ手は打たない → -1;
         if ( check_run2(cell, mycolor, i, j) ) { values[i][j] = -1; }
-        // ランダム
+        // 2連を防ぐ → 100;
+        if ( check_run(cell, mycolor*-1, i, j, 2) ) { values[i][j] = 100; }
+      	// ランダム
         if (values[i][j] == 0) {
           int aaa = (int) Math.round(Math.random() * 15);
           if (values[i][j] < aaa) { values[i][j] = aaa; }

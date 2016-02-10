@@ -116,9 +116,15 @@ public class User_s13t239_01 extends GogoCompSub {
           continue;
         }
         // 自分の石を守る → 500;
-        if ( check_rem(cell, mycolor*-1, i, j) ) { values[i][j] = 500; }
+        if ( check_rem(cell, mycolor*-1, i, j) ) { 
+          values[i][j] = 500; 
+          continue;
+        }
         // 相手の石を取る → 400;
-        if ( check_rem(cell, mycolor, i, j) ) { values[i][j] = 400; }
+        if ( check_rem(cell, mycolor, i, j) ) { 
+          values[i][j] = 400; 
+          continue;
+        }
         // 相手の三連を防ぐ → 300;
         if ( check_run(cell, mycolor*-1, i, j, 3) || check_run1(cell, mycolor*-1, i, j, 3)) {
           values[i][j] = 300;
@@ -129,8 +135,12 @@ public class User_s13t239_01 extends GogoCompSub {
         // 三々の禁じ手は打たない → -1;
         if ( check_run2(cell, mycolor, i, j) ) { values[i][j] = -1; }
         // 2連を防ぐ → 100;
-        if ( check_run(cell, mycolor*-1, i, j, 2) ) { values[i][j] = 100; }
-      	// ランダム
+        if ( check_run(cell, mycolor*-1, i, j, 2) ) { 
+          if ( values[i][j] != -1 ) {
+            values[i][j] = 100; 
+          }
+        }
+        // ランダム
         if (values[i][j] == 0) {
           int aaa = (int) Math.round(Math.random() * 15);
           if (values[i][j] < aaa) { values[i][j] = aaa; }

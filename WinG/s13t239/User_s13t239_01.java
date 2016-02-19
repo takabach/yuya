@@ -84,11 +84,7 @@ public class User_s13t239_01 extends GogoCompSub {
           values[i][j] = -1;
           continue;
         }
-        // 三々の禁じ手は打たない → -1;
-        if ( check_run2(cell, mycolor, i, j) ) { 
-          values[i][j] = -1; 
-          continue;
-        }
+        
         // 勝利(五取) → 1000;
         if ( mystone == 8 && check_rem(cell, mycolor*-1, i, j) ) {
           values[i][j] = 1000;
@@ -122,6 +118,11 @@ public class User_s13t239_01 extends GogoCompSub {
         // 自分の四連を作る → 600;
         if ( check_run(cell, mycolor, i, j, 4) || check_run1(cell, mycolor, i, j, 4) ) {
           values[i][j] = 600;
+          continue;
+        }
+        // 三々の禁じ手は打たない → -1;
+        if ( check_run2(cell, mycolor, i, j) ) { 
+          values[i][j] = -1; 
           continue;
         }
         // 自分の石を守る → 500;
@@ -219,67 +220,58 @@ public class User_s13t239_01 extends GogoCompSub {
 //----------------------------------------------------------------
   
   boolean check_run_dir1(int[][] board, int color, int i, int j, int dx, int dy, int len) {
-    int flag = 1;
+    boolean flag = true;
     int k;
-    int x,y,x1,y1;
+    int x,y;
     
     //-----  5連の判定
     if ( len == 5 ) {
-      for ( k = 1; k < 3; k++ ) {
+      for ( k = -2; k <= 2; k++ ) {
+        if ( k == 0 ) { continue; }
         x = i+k*dx;
         y = j+k*dy;
-        x1 = i+k*dx*-1;
-        y1 = j+k*dy*-1;
-        if ( x < 0 || y < 0 || x >= size || y >= size ) { flag = -1; break; }
-        if ( x1 < 0 || y1 < 0 || x1 >= size || y1 >= size ) { flag = -1; break; }
-        if ( board[x][y] != color ) { flag = -1; break; }
-        if ( board[x1][y1] != color ) { flag = -1; break; }
+        if ( x < 0 || y < 0 || x >= size || y >= size ) { flag = false; break; }
+        if ( board[x][y] != color ) { flag = false; break; }
       }
-      if ( flag == -1 ) {
-        for ( k = 1; k < 4; k++ ) {
+      if ( flag == false ) {
+        for ( k = -1; k <= 3; k++ ) {
+          if ( k == 0 ) { continue; }
           x = i+k*dx;
           y = j+k*dy;
-          x1 = i+dx*-1;
-          y1 = j+dy*-1;
           if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
-          if ( x1 < 0 || y1 < 0 || x1 >= size || y1 >= size ) { return false; }
           if ( board[x][y] != color ) { return false; }
-          if ( board[x1][y1] != color ) { return false; }
         }
       }
       return true;
       
     //-----  4連の判定
     } else if ( len == 4 ) {
-      for ( k = 1; k < 3; k++ ) {
+      for ( k = -1; k <= 2; k++ ) {
+      	if ( k == 0 ) { continue; }
         x = i+k*dx;
         y = j+k*dy;
-      	x1 = i+dx*(-1);
-      	y1 = j+dy*(-1);
-        if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
-        if ( x1 < 0 || y1 < 0 || x1 >= size || y1 >= size ) { return false; }
-        if ( board[x][y] != color ) { return false; }
-        if ( board[x1][y1] != color ) { return false; }
+        if ( x < 0 || y < 0 || x >= size || y >= size ) { flag = false; break; }
+        if ( board[x][y] != color ) { flag = false; break; }
       }
-      x = i+4*dx;
-      y = j+4*dy;
-      x1 = i+dx*(-2);
-      y1 = j+dx*(-2);
-      if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
-      if ( x1 < 0 || y1 < 0 || x1 >= size || y1 >= size ) { return false; }
-      if ( board[x][y] == color*-1 || board[x1][y1] == color*-1 ) { return false; }
+      if ( flag == false ) {
+        for ( k = -1; k <= 3; k = k+2 ) {
+          x = i+k*dx;
+          y = j+k*dy;
+          if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
+          if ( board[x][y] != color ) { return false; }
+        }
+      }
       return true;
       
     //----- 3連の判定
     } else {
-      x = i+dx;
-      y = j+dy;
-      x1 = i+dx*-1;
-      y1 = j+dy*-1;
-      if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
-      if ( x1 < 0 || y1 < 0 || x1 >= size || y1 >= size ) { return false; }
-      if ( board[x][y] != color ) { return false; }
-      if ( board[x1][y1] != color ) { return false; }
+      for ( k = -1; k <= 1; k++ ) {
+        if ( k == 0 ) { continue; }
+        x = i+dx;
+        y = j+dy;
+        if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
+        if ( board[x][y] != color ) { return false; }
+      }
       return true;
     }
   }
@@ -293,16 +285,54 @@ public class User_s13t239_01 extends GogoCompSub {
     
     for ( int dx = -1; dx <= 1; dx++ ) {
       for ( int dy = -1; dy <= 1; dy++ ) {
-        if ( dx == 0 || dy == 0 ) { continue; }
-        if ( check_run_dir(board, color, i, j, dx, dy, 3) ) { 
-          cnt++; 
-        } else if ( dx < 1 && dy < 1 && check_run_dir1(board, color, i, j, dx, dy, 3) ) {
-          cnt++;
-        }
+        if ( dx == 0 && dy == 0 ) { continue; }
+        if ( check_run_dir2(board, color, i, j, dx, dy, 0) ) { cnt++; }
+        else if ( dx < 1 && dx < 1 && check_run_dir2(board, color, i, j, dx, dy, 1) ) { cnt++; }
       }
     }
     if ( cnt > 1 ) { return true; }
     else { return false; }
+  }
+
+//----------------------------------------------------------------
+//  連の方向チェック(止連・端連・長連も含む、飛びは無視)
+//----------------------------------------------------------------
+  
+  boolean check_run_dir2(int[][] board, int color, int i, int j, int dx, int dy,int jump) {
+    int x,y,x1,y1;
+    int k;
+    
+    if ( jump == 0 ) {
+      for ( k = 1; k < 3; k++ ) {
+        x = i+k*dx;
+        y = j+k*dy;
+        if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
+        if ( board[x][y] != color ) { return false; }
+      }
+      x = i+3*dx;
+      y = j+3*dy;
+      if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
+      if ( board[x][y] == color ) { return false; }
+      return true;
+    } else {
+      for ( k = 1; k < 2; k++ ) {
+        x = i+k*dx;
+        y = j+k*dy; 
+        x1 = i+k*dx*-1;
+        y1 = j+k*dy*-1;
+        if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
+        if ( x1 < 0 || y1 < 0 || x1 >= size || y1 >= size ) { return false; }
+        if ( board[x][y] != color || board[x1][y1] != color ) { return false; }
+      }
+      x = i+k*dx;
+      y = j+k*dy; 
+      x1 = i+k*dx*-1;
+      y1 = j+k*dy*-1;
+      if ( x < 0 || y < 0 || x >= size || y >= size ) { return false; }
+      if ( x1 < 0 || y1 < 0 || x1 >= size || y1 >= size ) { return false; }
+      if ( board[x][y] == color || board[x1][y1] == color ) { return false; }
+      return true;
+    }
   }
 
 //----------------------------------------------------------------
@@ -345,13 +375,13 @@ public class User_s13t239_01 extends GogoCompSub {
     //--  評価値が最大となるマス
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < size; j++) {
-      	System.out.printf("%4d ",values[i][j]);
+      	//System.out.printf("%4d ",values[i][j]);
         if (value < values[i][j]) {
           hand.set_hand(i, j);
           value = values[i][j];
         }
       }
-      System.out.printf("\n");
+      //System.out.printf("\n");
     }
     return hand;
   }
